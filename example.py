@@ -11,16 +11,18 @@ from tensorflow.keras import layers
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from keras.utils.np_utils import to_categorical
 
 img_size = (128,128)
 num_classes = 5
-MAX=1
-PREDICT = 1
+MAX=5
+PREDICT =5
+EPOCHS=100
 
 def createNetworkManual():
     inputs = keras.Input(shape = img_size+(1,))
     x = layers.Conv2D(32, 3, strides = 2, padding="same")(inputs)
-    x = layers.BatchNormalization()(x)
+    #x = layers.BatchNormalization()(x)
     x = layers.Activation("relu")(x)
 #https://keras.io/examples/vision/oxford_pets_image_segmentation/
     prev = x
@@ -28,11 +30,11 @@ def createNetworkManual():
     for filters in [64, 128, 256]:
         x = layers.Activation("relu")(x)
         x = layers.SeparableConv2D(filters, 3, padding="same")(x)
-        x = layers.BatchNormalization()(x)
+        #x = layers.BatchNormalization()(x)
 
         x = layers.Activation("relu")(x)
         x = layers.SeparableConv2D(filters, 3, padding="same")(x)
-        x = layers.BatchNormalization()(x)
+        #x = layers.BatchNormalization()(x)
 
         x = layers.MaxPooling2D(3, strides=2, padding="same")(x)
 
@@ -48,11 +50,11 @@ def createNetworkManual():
     for filters in [256, 128, 64, 32]:
         x = layers.Activation("relu")(x)
         x = layers.Conv2DTranspose(filters, 3, padding="same")(x)
-        x = layers.BatchNormalization()(x)
+        #x = layers.BatchNormalization()(x)
 
         x = layers.Activation("relu")(x)
         x = layers.Conv2DTranspose(filters, 3, padding="same")(x)
-        x = layers.BatchNormalization()(x)
+        #x = layers.BatchNormalization()(x)
 
         x = layers.UpSampling2D(2)(x)
 
@@ -93,23 +95,28 @@ for labelPath in glob.iglob(f'{labelsTrainDir}/*'):
     if i == PREDICT:
         print(labelPath)
         axarr[0].imshow((photo*255)[...,np.newaxis])
-        axarr[1].imshow(ImageOps.autocontrast(keras.utils.array_to_img(label[...,np.newaxis])))
+        axarr[1].imshow(ImageOps.autocontrast(
+            keras.utils.array_to_img(
+                tf.image.resize(label[...,np.newaxis], img_size, tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+            )
+        ))
     if i == MAX:
         break
     i = i + 1
 
 inputArr = tf.image.resize(np.array(inputData)[...,np.newaxis], img_size)
 outputArr = tf.image.resize(np.array(outputData)[...,np.newaxis], img_size, tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-
-model.compile(optimizer="adam", loss="sparse_categorical_crossentropy")
-keras.backend.set_value(model.optimizer.learning_rate, 0.00001)
-model.fit(x=inputArr, y=outputArr, batch_size=1, epochs=400)
+outputArr = to_categorical(outputArr)
+model.compile(optimizer="adam", loss="categorical_crossentropy")
+keras.backend.set_value(model.optimizer.learning_rate, 0.001)
+#outputArr[:,:,:,4]/=10 #numer 4 to null i nie chcemy tego klasyfikować jakoś bardzo
+#outputArr[:,:,:,0]/=2
+model.fit(x=inputArr, y=outputArr, batch_size=1, epochs=EPOCHS)
 
 # Display mask predicted by our model
-preds = model.predict(inputArr[PREDICT][np.newaxis,...])
+preds = model.predict(inputArr[PREDICT][np.newaxis,...])[0]
 mask = np.argmax(preds, axis=-1)
-mask = np.expand_dims(mask, axis=-1)
-img = ImageOps.autocontrast(keras.utils.array_to_img(mask[0]))
+img = ImageOps.autocontrast(keras.utils.array_to_img(mask[...,np.newaxis]))
 axarr[2].imshow(img)
 
 plt.show()
