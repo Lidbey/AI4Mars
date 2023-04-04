@@ -1,3 +1,8 @@
+#own
+/data/ai4mars-dataset-merged-0.1/*
+/.idea
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
