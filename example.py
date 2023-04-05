@@ -14,13 +14,11 @@ from keras.utils.np_utils import to_categorical
 import models
 import training
 
-
+#axadadaxd
 def loadDataWIP(img_size, amount):
     dir = 'data/ai4mars-dataset-merged-0.1/msl/'
     labelsTrainDir = dir + 'labels/train/'
     photosDir = dir + 'images/edr/'
-    inputData = []
-    outputData = []
     i = 0
     for labelPath in glob.iglob(f'{labelsTrainDir}/*'):
         label = iio.imread(labelPath).copy()
