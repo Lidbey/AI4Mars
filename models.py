@@ -56,5 +56,50 @@ def modelv1(img_size, num_classes):
     return model
 
 #def modelv2():
-#def saveModel(name)
-#def loadModel(name)
+"""
+import os
+from tensorflow.keras.models import model_from_json
+
+def saveModel(directory):
+    filename = 'modelv1_'
+    i = 1
+    while os.path.exists(os.path.join(directory, f"{filename}{i}.py")):
+        i += 1
+    name = f"{filename}{i}"
+    filepath = os.path.join(directory, f"{name}.py")
+    with open(filepath, 'w') as f:
+        f.write(inspect.getsource(modelv1))
+    
+    architecture_path = os.path.join(directory, f"{name}.json")
+    with open(architecture_path, 'w') as f:
+        f.write(model.to_json())
+    
+    weights_path = os.path.join(directory, f"{name}.h5")
+    model.save_weights(weights_path)
+"""
+
+"""
+from tensorflow.keras.models import load_model
+
+def loadModel(directory)
+    with open(f"{directory}.json", 'r') as f:
+        model_architecture = f.read()
+    model = model_from_json(model_architecture)
+    
+    model.load_weights(f"{directory}.h5")
+    
+    return model
+"""
+
+"""
+from tensorflow.keras.callbacks import ModelCheckpoint
+import os
+
+def callbackModel(model, directory):
+    checkpoint_callback = ModelCheckpoint(
+        filepath=os.path.join(directory, 'model_{epoch:02d}_{batch:04d}.h5'),
+        save_weights_only=True,
+        save_freq=100,
+    )
+    return checkpoint_callback
+"""
