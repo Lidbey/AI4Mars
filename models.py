@@ -103,3 +103,6 @@ def callbackModel(model, directory):
     )
     return checkpoint_callback
 """
+
+def vgg16():
+    return None
