@@ -7,4 +7,4 @@ def basicTrain(model, input, output, epochs):
     model.fit(generator, epochs=epochs)
 
 
-#callbacki
+#callbackixx
