@@ -15,25 +15,6 @@ class DataGenerator(Sequence):
                  n_classes=5, shuffle=True, n=-1):
 
         self.list_IDs = []
-
-        for labelPath in glob.iglob(f'{mask_path}/*'):
-            labelName = os.path.basename(labelPath)
-            photoName = os.path.splitext(labelName)[0]
-            self.list_IDs.append(photoName)
-
-        if n != -1:
-            self.list_IDs = self.list_IDs[0:n]
-
-        """Initialization
-                :param list_IDs: list of all 'label' ids to use in the generator
-                :param image_path: path to images location
-                :param mask_path: path to masks location
-                :param batch_size: batch size at each iteration
-                :param dim: tuple indicating image dimension
-                :param n_channels: number of image channels
-                :param n_classes: number of output masks
-                :param shuffle: True to shuffle label indexes after every epoch
-                """
         self.dim = dim
         self.batch_size = batch_size
         self.image_path = image_path
@@ -43,6 +24,15 @@ class DataGenerator(Sequence):
         self.shuffle = shuffle
         self.on_epoch_end()
         self.n = n
+
+        for labelPath in glob.iglob(f'{mask_path}/*'):
+            labelName = os.path.basename(labelPath)
+            photoName = os.path.splitext(labelName)[0]
+            self.list_IDs.append(photoName)
+
+        if n != -1:
+            self.list_IDs = self.list_IDs[0:n]
+
 
     def __len__(self):
         return int(np.floor(len(self.list_IDs) / self.batch_size))
