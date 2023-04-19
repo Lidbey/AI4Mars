@@ -22,7 +22,6 @@ class DataGenerator(Sequence):
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.shuffle = shuffle
-        self.on_epoch_end()
         self.n = n
 
         for labelPath in glob.iglob(f'{mask_path}/*'):
@@ -32,6 +31,7 @@ class DataGenerator(Sequence):
 
         if n != -1:
             self.list_IDs = self.list_IDs[0:n]
+        self.on_epoch_end()
 
 
     def __len__(self):
