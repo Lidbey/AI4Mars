@@ -50,7 +50,6 @@ def modelv1(img_size, num_classes):
 
         # Add a per-pixel classification layer
     outputs = layers.Conv2D(num_classes, 3, activation="softmax", padding="same")(x)
-
         # Define the model
     model = keras.Model(inputs, outputs)
     return model

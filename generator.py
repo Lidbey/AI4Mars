@@ -26,18 +26,28 @@ class DataGenerator(Sequence):
         self.n = n
 
         for labelPath in glob.iglob(f'{mask_path}/*'):
-            labelName = os.path.basename(labelPath)
-            photoName = os.path.splitext(labelName)[0]
+            labelName = os.path.basename(labelPath) # C:/Users/Wojtek/ai4mars/zdjecia/zdjecie1.png
+            photoName = os.path.splitext(labelName)[0] # zdjecie1
             self.list_IDs.append(photoName)
-
+        # ['zdjecie1', 'zdjecie2', 'zdjecie3']
         if n != -1:
-            self.list_IDs = self.list_IDs[0:n]
+            self.list_IDs = self.list_IDs[0:n-1]
+        #jesli n byloby np 2 to bysmy wzieli tylko od 0 do 1 ['zdjecie1', 'zdjecie2']
+        #
+        #['p1', 'p2', 'p3'] # 3
+        #[0,1,2,3,4,5] # 6
 
 
-    def __len__(self):
+        #jeżeli numer zdjecia(x) ktory chcemy wczytac jest wiekszy niz 3 to zaugmentuj zdjęcie x-3
+
+    # batch - ile zdjęć na raz treunjemy
+    def __len__(self): #100k zdjęć, po 100 czyli to nam da 1 tysiąc
         return int(np.floor(len(self.list_IDs) / self.batch_size))
 
-    def __getitem__(self, index):
+    def __getitem__(self, index): # 0, 1, 2, 3, 4 <- jeżeli np jest 0, to daj nam pierwszy batch danych (zdjecia od 0 do 99)
+        #0 - > 0:100
+        #1 -> 100:200
+
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
         list_IDs_temp = [self.list_IDs[k] for k in indexes]
         X, y = self.__data_generation(list_IDs_temp)
@@ -50,7 +60,10 @@ class DataGenerator(Sequence):
 
 
     def __data_generation(self, list_IDs_temp):
-
+        #list_IDs_temp = [0,5,3]
+        #0 < 3 OK
+        #5 <! 3 WIĘC bierzemy zdjęcie 5-3=2 i je augmuntujemy
+        #3 < 3 WIĘC BIERZEMY ZDJĘCIE 3-3=0 i je augmuntujemy
         X = []
         y = []
 
