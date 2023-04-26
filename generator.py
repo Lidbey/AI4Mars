@@ -63,12 +63,14 @@ class DataGenerator(Sequence):
             photoPath = self.image_path + ID + '.JPG'
             photo = iio.imread(photoPath) / 255.0
 
+            photo = [photo, photo, photo]
+
             X.append(photo)
             y.append(label)
 
-        Xarr = tf.image.resize(np.array(X)[..., np.newaxis], self.dim)
+        Xarr = tf.image.resize(np.transpose(np.array(X), (0,3,2,1)), self.dim)
         yarr = tf.image.resize(np.array(y)[..., np.newaxis], self.dim,
                                tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-        yarr = to_categorical(yarr)
+        #yarr = to_categorical(yarr)
 
         return Xarr, yarr

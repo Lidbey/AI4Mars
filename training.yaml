@@ -1,0 +1,11 @@
+train: ../AI4Mars/data/ai4mars-dataset-merged-0.1/msl/images/edr/
+val:  ../AI4Mars/data/ai4mars-dataset-merged-0.1/msl/labels/tt/
+
+# number of classes
+nc: 5
+
+# class names
+names: ["trafficlight","stop", "speedlimit","crosswalk","x"]
+
+# 3940
+# 

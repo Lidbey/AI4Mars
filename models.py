@@ -1,5 +1,8 @@
 from tensorflow.keras import layers
+import tensorflow as tf
 import keras
+from keras_cv_attention_models import yolov8
+from ultralytics import YOLO
 
 MODEL_PATH = 'models/'
 
@@ -53,6 +56,16 @@ def modelv1(img_size, num_classes):
 
         # Define the model
     model = keras.Model(inputs, outputs)
+    return model
+
+def modelYOLOv8(inputShape):
+    model = keras.Sequential()
+    model.add(yolov8.YOLOV8_N(inputShape))
+    #model.add(layers.Dense(128, activation='softmax'))
+    return model
+
+def modelYOLOv8seg():
+    model = YOLO('yolov8n-seg.yaml').load('/models/yolov8n-seg.pt')
     return model
 
 #def modelv2():

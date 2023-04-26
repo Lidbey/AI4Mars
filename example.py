@@ -42,7 +42,7 @@ def loadDataWIP(img_size, amount):
     return inputArr, outputArr
 
 
-model = models.modelv1((128,128), 5)
+model = models.modelYOLOv8((128,128,3))
 input, output = loadDataWIP((128,128),3)
 training.basicTrain(model, input, output, 30)
 
