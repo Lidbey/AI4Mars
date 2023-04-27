@@ -51,24 +51,21 @@ class DataGenerator(Sequence):
 
     def __data_generation(self, list_IDs_temp):
 
-        X = []
-        y = []
+        x = np.zeros(shape=(len(list_IDs_temp), 128, 128, 1))
+        y = np.zeros(shape=(len(list_IDs_temp), 128, 128, 1))
 
         for i, ID in enumerate(list_IDs_temp):
 
-            labelpath = self.mask_path + ID + '.PNG'
-            label = iio.imread(labelpath).copy()
-            label[label == 255] = 4
+            labelPath = self.mask_path + ID + '.PNG'
+            label = iio.imread(labelPath)
+            y[i] = tf.image.resize(label[..., np.newaxis], self.dim, tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
             photoPath = self.image_path + ID + '.JPG'
-            photo = iio.imread(photoPath) / 255.0
+            photo = iio.imread(photoPath)
+            x[i] = tf.image.resize(photo[..., np.newaxis], self.dim)
 
-            X.append(photo)
-            y.append(label)
+        y[y == 255] = 4
+        y = to_categorical(y)
+        x = x / 255.0
 
-        Xarr = tf.image.resize(np.array(X)[..., np.newaxis], self.dim)
-        yarr = tf.image.resize(np.array(y)[..., np.newaxis], self.dim,
-                               tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-        yarr = to_categorical(yarr)
-
-        return Xarr, yarr
+        return x, y
