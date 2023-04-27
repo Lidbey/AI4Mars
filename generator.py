@@ -6,6 +6,9 @@ from keras.utils.np_utils import to_categorical
 import os
 import imageio.v3 as iio
 
+from preprocessing import resize
+
+
 class DataGenerator(Sequence):
     def __init__(self,
                  image_path = 'data/ai4mars-dataset-merged-0.1/msl/images/edr/',
@@ -40,8 +43,8 @@ class DataGenerator(Sequence):
     def __getitem__(self, index):
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
         list_IDs_temp = [self.list_IDs[k] for k in indexes]
-        X, y = self.__data_generation(list_IDs_temp)
-        return X, y
+        x, y = self.__data_generation(list_IDs_temp)
+        return x, y
 
     def on_epoch_end(self):
         self.indexes = np.arange(len(self.list_IDs))
@@ -51,18 +54,18 @@ class DataGenerator(Sequence):
 
     def __data_generation(self, list_IDs_temp):
 
-        x = np.zeros(shape=(len(list_IDs_temp), 128, 128, 1))
-        y = np.zeros(shape=(len(list_IDs_temp), 128, 128, 1))
+        x = np.zeros(shape=(len(list_IDs_temp), self.dim[0], self.dim[1], 1))
+        y = np.zeros(shape=(len(list_IDs_temp), self.dim[0], self.dim[1], 1))
 
         for i, ID in enumerate(list_IDs_temp):
 
             labelPath = self.mask_path + ID + '.PNG'
             label = iio.imread(labelPath)
-            y[i] = tf.image.resize(label[..., np.newaxis], self.dim, tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+            y[i] = resize(label, self.dim, tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
             photoPath = self.image_path + ID + '.JPG'
             photo = iio.imread(photoPath)
-            x[i] = tf.image.resize(photo[..., np.newaxis], self.dim)
+            x[i] = resize(photo, self.dim)
 
         y[y == 255] = 4
         y = to_categorical(y)

@@ -1,3 +1,7 @@
+import numpy as np
+import tensorflow as tf
+
+
 def preprocessImage(img):
     #newImg = adjustGamma(img, params)
     #...
@@ -11,5 +15,8 @@ def applyMask(img, mask):
     return img
 
 
-def resize(img, size):
-    return img
+def resize(img, size, type=None):
+    if type is None:
+        return tf.image.resize(img[..., np.newaxis], size)
+    else:
+        return tf.image.resize(img[..., np.newaxis], size, type)
