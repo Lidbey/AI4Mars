@@ -48,7 +48,7 @@ def loadDataWIP(img_size, amount, channels=1):
 
 # model = models.modelv1((128, 128), 5)
 model = models.segmentation_models_unet((128, 128, 3), 5)
-input, output = loadDataWIP((128, 128), 3)
+input, output = loadDataWIP((128, 128), 3, 3)
 training.basicTrain(model, input, output, 30, 3)
 
 predicted_id = 2
