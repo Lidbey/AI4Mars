@@ -54,7 +54,7 @@ class DataGenerator(Sequence):
 
     def __data_generation(self, list_IDs_temp):
 
-        x = np.zeros(shape=(len(list_IDs_temp), self.dim[0], self.dim[1], 1))
+        x = np.zeros(shape=(len(list_IDs_temp), self.dim[0], self.dim[1], 3, 1))
         y = np.zeros(shape=(len(list_IDs_temp), self.dim[0], self.dim[1], 1))
 
         for i, ID in enumerate(list_IDs_temp):
@@ -65,10 +65,11 @@ class DataGenerator(Sequence):
 
             photoPath = self.image_path + ID + '.JPG'
             photo = iio.imread(photoPath)
-            x[i] = resize(photo, self.dim)
+            x[i] = np.repeat(resize(photo, self.dim)[:, :, np.newaxis], 3, axis=2)
 
         y[y == 255] = 4
         y = to_categorical(y)
         x = x / 255.0
+        x = x.reshape((len(list_IDs_temp), self.dim[0], self.dim[1], 3))
 
         return x, y
