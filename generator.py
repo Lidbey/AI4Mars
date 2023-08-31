@@ -6,6 +6,9 @@ from keras.utils.np_utils import to_categorical
 import os
 import imageio.v3 as iio
 
+from preprocessing import resize
+
+
 class DataGenerator(Sequence):
     def __init__(self,
                  image_path = 'data/ai4mars-dataset-merged-0.1/msl/images/edr/',
@@ -40,8 +43,8 @@ class DataGenerator(Sequence):
     def __getitem__(self, index):
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
         list_IDs_temp = [self.list_IDs[k] for k in indexes]
-        X, y = self.__data_generation(list_IDs_temp)
-        return X, y
+        x, y = self.__data_generation(list_IDs_temp)
+        return x, y
 
     def on_epoch_end(self):
         self.indexes = np.arange(len(self.list_IDs))
@@ -51,28 +54,23 @@ class DataGenerator(Sequence):
 
     def __data_generation(self, list_IDs_temp):
 
-        X = []
-        y = []
+        x = np.zeros(shape=(len(list_IDs_temp), self.dim[0], self.dim[1], self.n_channels))
+        y = np.zeros(shape=(len(list_IDs_temp), self.dim[0], self.dim[1], 1))
 
         for i, ID in enumerate(list_IDs_temp):
 
-            labelpath = self.mask_path + ID + '.PNG'
-            label = iio.imread(labelpath).copy()
-            label[label == 255] = 4
+            labelPath = self.mask_path + ID + '.PNG'
+            label = iio.imread(labelPath)
+            y[i] = resize(label, self.dim, tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
             photoPath = self.image_path + ID + '.JPG'
-            photo = iio.imread(photoPath) / 255.0
+            photo = iio.imread(photoPath)
+            photo = resize(photo, self.dim)
+            photo = np.repeat(photo, self.n_channels, axis=-1)
+            x[i] = photo
 
-            photo = np.expand_dims(photo, -1)
-            photo = photo.repeat(self.n_channels, axis=-1)
+        y[y == 255] = 4
+        y = to_categorical(y)
+        x = x / 255.0
 
-            X.append(photo)
-            y.append(label)
-
-        Xarr = tf.image.resize(np.array(X), self.dim)
-        # print(Xarr)
-        yarr = tf.image.resize(np.array(y)[..., np.newaxis], self.dim,
-                               tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-        yarr = to_categorical(yarr)
-
-        return Xarr, yarr
+        return x, y

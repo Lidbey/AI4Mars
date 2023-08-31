@@ -4,23 +4,22 @@ import segmentation_models as sm
 
 MODEL_PATH = 'models/'
 
-
 def modelv1(img_size, num_classes):
-    inputs = keras.Input(shape=img_size + (1,))
-    x = layers.Conv2D(32, 3, strides=2, padding="same")(inputs)
-    # x = layers.BatchNormalization()(x)
+    inputs = keras.Input(shape = img_size+(1,))
+    x = layers.Conv2D(32, 3, strides = 2, padding="same")(inputs)
+    #x = layers.BatchNormalization()(x)
     x = layers.Activation("relu")(x)
-    # https://keras.io/examples/vision/oxford_pets_image_segmentation/
+#https://keras.io/examples/vision/oxford_pets_image_segmentation/
     prev = x
 
     for filters in [64, 128, 256]:
         x = layers.Activation("relu")(x)
         x = layers.SeparableConv2D(filters, 3, padding="same")(x)
-        # x = layers.BatchNormalization()(x)
+        #x = layers.BatchNormalization()(x)
 
         x = layers.Activation("relu")(x)
         x = layers.SeparableConv2D(filters, 3, padding="same")(x)
-        # x = layers.BatchNormalization()(x)
+        #x = layers.BatchNormalization()(x)
 
         x = layers.MaxPooling2D(3, strides=2, padding="same")(x)
 
@@ -36,15 +35,15 @@ def modelv1(img_size, num_classes):
     for filters in [256, 128, 64, 32]:
         x = layers.Activation("relu")(x)
         x = layers.Conv2DTranspose(filters, 3, padding="same")(x)
-        # x = layers.BatchNormalization()(x)
+        #x = layers.BatchNormalization()(x)
 
         x = layers.Activation("relu")(x)
         x = layers.Conv2DTranspose(filters, 3, padding="same")(x)
-        # x = layers.BatchNormalization()(x)
+        #x = layers.BatchNormalization()(x)
 
         x = layers.UpSampling2D(2)(x)
 
-        # Project residual
+            # Project residual
         residual = layers.UpSampling2D(2)(prev)
         residual = layers.Conv2D(filters, 1, padding="same")(residual)
         x = layers.add([x, residual])  # Add back residual
@@ -53,12 +52,12 @@ def modelv1(img_size, num_classes):
         # Add a per-pixel classification layer
     outputs = layers.Conv2D(num_classes, 3, activation="softmax", padding="same")(x)
 
-    # Define the model
+        # Define the model
     model = keras.Model(inputs, outputs)
     return model
 
 
-def segmentation_models_unet(img_size, num_classes):
+def mobilenet_v2_unet(img_size, num_classes):
     """
     When using this model add SM_FRAMEWORK=tf.keras to environmental variables
 
@@ -66,55 +65,16 @@ def segmentation_models_unet(img_size, num_classes):
     :param num_classes:
     :return:
     """
-    model = sm.Unet('resnet34', input_shape=img_size, classes=num_classes, activation='softmax')
+
+    model = sm.Unet('mobilenetv2', input_shape=img_size, classes=num_classes, activation='softmax')
     return model
 
 
-# def modelv2():
-"""
-import os
-from tensorflow.keras.models import model_from_json
+#def modelv2():
 
-def saveModel(directory):
-    filename = 'modelv1_'
-    i = 1
-    while os.path.exists(os.path.join(directory, f"{filename}{i}.py")):
-        i += 1
-    name = f"{filename}{i}"
-    filepath = os.path.join(directory, f"{name}.py")
-    with open(filepath, 'w') as f:
-        f.write(inspect.getsource(modelv1))
+def saveModel(model, name):
+    model.save(f'models/{name}')
 
-    architecture_path = os.path.join(directory, f"{name}.json")
-    with open(architecture_path, 'w') as f:
-        f.write(model.to_json())
-
-    weights_path = os.path.join(directory, f"{name}.h5")
-    model.save_weights(weights_path)
-"""
-
-"""
-from tensorflow.keras.models import load_model
-
-def loadModel(directory)
-    with open(f"{directory}.json", 'r') as f:
-        model_architecture = f.read()
-    model = model_from_json(model_architecture)
-
-    model.load_weights(f"{directory}.h5")
-
+def loadModel(name):
+    model = keras.models.load_model(f'models/{name}')
     return model
-"""
-
-"""
-from tensorflow.keras.callbacks import ModelCheckpoint
-import os
-
-def callbackModel(model, directory):
-    checkpoint_callback = ModelCheckpoint(
-        filepath=os.path.join(directory, 'model_{epoch:02d}_{batch:04d}.h5'),
-        save_weights_only=True,
-        save_freq=100,
-    )
-    return checkpoint_callback
-"""
