@@ -1,5 +1,6 @@
 from tensorflow.keras import layers
 import keras
+import segmentation_models as sm
 
 MODEL_PATH = 'models/'
 
@@ -54,6 +55,20 @@ def modelv1(img_size, num_classes):
         # Define the model
     model = keras.Model(inputs, outputs)
     return model
+
+
+def mobilenet_v2_unet(img_size, num_classes):
+    """
+    When using this model add SM_FRAMEWORK=tf.keras to environmental variables
+
+    :param img_size: tuple(width, height, channels)
+    :param num_classes:
+    :return:
+    """
+
+    model = sm.Unet('mobilenetv2', input_shape=img_size, classes=num_classes, activation='softmax')
+    return model
+
 
 #def modelv2():
 

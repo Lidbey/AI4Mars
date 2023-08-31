@@ -9,12 +9,13 @@ import os
 from generator import DataGenerator
 import imageio.v3 as iio
 from preprocessing import resize
+import tensorflow as tf
 
 
-def basicTrain(model, epochs, batch_size=64, n=-1, learning_rate=0.001, save_freq=sys.maxsize):
+def basicTrain(model, epochs, batch_size=64, n=-1, learning_rate=0.001, save_freq=sys.maxsize, n_channels=1):
     model.compile(optimizer="adam", loss="categorical_crossentropy")
     keras.backend.set_value(model.optimizer.learning_rate, learning_rate)
-    generator = DataGenerator(n=n, batch_size=batch_size)
+    generator = DataGenerator(n=n, batch_size=batch_size, n_channels=n_channels)
     model.fit(generator, epochs=epochs, callbacks=[callbackModelBatch('models/checkpoints', save_freq)])
 
 def callbackModelBatch(directory, n=100):
@@ -34,13 +35,16 @@ def callbackModelEpoch(directory):
     return checkpoint_callback
 
 
-def predict(model, fileName, shape=(128,128)):
+def predict(model, fileName, shape=(128, 128), n_channels=3):
     image_path = 'data/ai4mars-dataset-merged-0.1/msl/images/edr/'
     mask_path = 'data/ai4mars-dataset-merged-0.1/msl/labels/train/'
     xPath = image_path + fileName + '.JPG'
     yPath = mask_path + fileName + '.PNG'
     x = resize(iio.imread(xPath), shape)/255.0
     y = resize(iio.imread(yPath), shape)
+
+    x = tf.repeat(x, repeats=[n_channels], axis=-1)
+
     yPred = np.argmax(model.predict(x[np.newaxis, ...]), axis=-1)
 
     return [x, y, yPred[0][..., np.newaxis]]
@@ -51,4 +55,3 @@ def plot(imgs):
     for i, img in enumerate(imgs):
         axarr[i].imshow(ImageOps.autocontrast(keras.utils.array_to_img(img)))
     plt.show()
-
