@@ -1,0 +1,6 @@
+Pillow
+keras
+matplotlib
+numpy
+imageio
+tensorflow==2.9.3

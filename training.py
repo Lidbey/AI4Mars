@@ -15,7 +15,7 @@ def basicTrain(model, epochs, batch_size=64, n=-1, learning_rate=0.001, save_fre
     model.compile(optimizer="adam", loss="categorical_crossentropy")
     keras.backend.set_value(model.optimizer.learning_rate, learning_rate)
     generator = DataGenerator(n=n, batch_size=batch_size)
-    model.fit(generator, epochs=epochs, callbacks=[callbackModelBatch('models/checkpoints', save_freq)])
+    model.fit(generator, epochs=epochs, callbacks=[callbackModelEpoch('models/checkpoints')])
 
 def callbackModelBatch(directory, n=100):
     checkpoint_callback = ModelCheckpoint(
