@@ -3,7 +3,7 @@ import training
 from datetime import datetime
 
 
-SAVE_MODEL = False
+SAVE_MODEL = True
 MODEL_NAME = 'v1'
 PREDICT_IMG = 'NLA_397681339EDR_F0020000AUT_04096M1'
 

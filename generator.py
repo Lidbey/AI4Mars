@@ -2,7 +2,7 @@ import glob
 import numpy as np
 import tensorflow as tf
 from keras.utils import Sequence
-from keras.utils.np_utils import to_categorical
+from keras.utils import to_categorical
 import os
 import imageio.v3 as iio
 
