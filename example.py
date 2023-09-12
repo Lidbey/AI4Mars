@@ -1,12 +1,12 @@
 import training
 from datetime import datetime
 import models
-import unet
+
 
 SAVE_MODEL = True
 MODEL_NAME = 'URX_resnext50'
 PREDICT_IMG = 'NLA_404684725EDR_F0050104NCAM00107M1'
-model_map={"URX": unet.Unet_resnext50(), "DFT": None}
+model_map={"URX": models.Unet_resnext50(), "DFT": None}
 
 model_type = "DFT"
 if len(MODEL_NAME)>2 and MODEL_NAME[:3] in model_map:
