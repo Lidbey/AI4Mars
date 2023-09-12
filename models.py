@@ -57,9 +57,17 @@ def modelv1(img_size, num_classes):
 
 #def modelv2():
 
-def saveModel(model, name):
-    model.save(f'models/{name}')
+def saveModel(model, name, weights_only=False):
+    if weights_only:
+        model.save_weights(f'models/{name}')
+    else:
+        model.save(f'models/{name}')
 
-def loadModel(name):
-    model = keras.models.load_model(f'models/{name}')
+def loadModel(name, model=None):
+    if model is None:
+        model = keras.models.load_model(f'models/{name}')
+    else:
+        model.load_weights(f'models/{name}')
     return model
+
+

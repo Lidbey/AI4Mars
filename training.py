@@ -7,28 +7,29 @@ from keras.callbacks import ModelCheckpoint
 from matplotlib import pyplot as plt
 import os
 from generator import DataGenerator
-import imageio.v3 as iio
+import imageio as iio
 from preprocessing import resize
 
 
-def basicTrain(model, epochs, batch_size=64, n=-1, learning_rate=0.001, save_freq=sys.maxsize):
+def basicTrain(model, epochs, batch_size=64, n=-1, learning_rate=0.001,  save_freq=sys.maxsize, weights_only=False):
     model.compile(optimizer="adam", loss="categorical_crossentropy")
     keras.backend.set_value(model.optimizer.learning_rate, learning_rate)
     generator = DataGenerator(n=n, batch_size=batch_size)
-    model.fit(generator, epochs=epochs, callbacks=[callbackModelEpoch('models/checkpoints')])
+    model.fit(generator, epochs=epochs, callbacks=[callbackModelEpoch('models/checkpoints', weights_only)])
 
-def callbackModelBatch(directory, n=100):
+
+def callbackModelBatch(directory, n=100, weights_only=False):
     checkpoint_callback = ModelCheckpoint(
         filepath=os.path.join(directory, 'model_{epoch:02d}_{batch:04d}'),
-        save_weights_only=False,
+        save_weights_only=weights_only,
         save_freq=n,
     )
     return checkpoint_callback
 
-def callbackModelEpoch(directory):
+def callbackModelEpoch(directory, weights_only=False):
     checkpoint_callback = ModelCheckpoint(
         filepath=os.path.join(directory, 'model_{epoch:02d}'),
-        save_weights_only=False,
+        save_weights_only=weights_only,
         save_freq='epoch',
     )
     return checkpoint_callback

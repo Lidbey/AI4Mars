@@ -4,7 +4,7 @@ import tensorflow as tf
 from keras.utils import Sequence
 from keras.utils.np_utils import to_categorical
 import os
-import imageio.v3 as iio
+import imageio as iio
 
 from preprocessing import resize
 
