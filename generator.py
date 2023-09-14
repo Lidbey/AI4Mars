@@ -11,13 +11,14 @@ from preprocessing import resize
 
 class DataGenerator(Sequence):
     def __init__(self,
+                 list_IDs,
                  image_path = 'data/ai4mars-dataset-merged-0.1/msl/images/edr/',
                  mask_path = 'data/ai4mars-dataset-merged-0.1/msl/labels/train/',
                  batch_size=32,
                  dim=(128, 128), n_channels=1,
-                 n_classes=5, shuffle=True, n1=0, n2=-1):
+                 n_classes=5, shuffle=True):
 
-        self.list_IDs = []
+        self.list_IDs = list_IDs
         self.dim = dim
         self.batch_size = batch_size
         self.image_path = image_path
@@ -25,18 +26,7 @@ class DataGenerator(Sequence):
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.shuffle = shuffle
-        self.n1 = n1
-        self.n2 = n2
 
-        for labelPath in glob.iglob(f'{mask_path}/*'):
-            labelName = os.path.basename(labelPath)
-            photoName = os.path.splitext(labelName)[0]
-            self.list_IDs.append(photoName)
-
-        if n2==-1:
-            self.list_IDs = self.list_IDs[n1:]
-        else:
-            self.list_IDs = self.list_IDs[n1:n2]
         self.on_epoch_end()
 
 

@@ -2,6 +2,7 @@
 /data/ai4mars-dataset-merged-0.1/*
 /.idea
 
+/sets/*
 /models/*
 
 # Byte-compiled / optimized / DLL files
