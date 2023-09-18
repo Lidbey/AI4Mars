@@ -40,7 +40,7 @@ def predict(model, fileName, shape=(128,128)):
     xPath = image_path + fileName + '.JPG'
     yPath = mask_path + fileName + '.PNG'
     x = resize(iio.imread(xPath), shape)/255.0
-    y = resize(iio.imread(yPath), shape)
+    y = resize(iio.imread(yPath), shape, 'nearest')
     yPred = np.argmax(model.predict(x[np.newaxis, ...]), axis=-1)
 
     return [x, y, yPred[0][..., np.newaxis]]
@@ -48,7 +48,20 @@ def predict(model, fileName, shape=(128,128)):
 
 def plot(imgs):
     f, axarr = plt.subplots(1, len(imgs))
-    for i, img in enumerate(imgs):
-        axarr[i].imshow(ImageOps.autocontrast(keras.utils.array_to_img(img)))
-    plt.show()
 
+    # image
+    axarr[0].imshow(imgs[0])
+
+    # true labels
+    y = imgs[1].numpy()
+    y[y == 255] = 4
+    y = y * 63.75
+    axarr[1].imshow(y)
+
+    # predicted labels
+    y = imgs[2]
+    y[y == 255] = 4
+    y = y * 63.75
+    axarr[2].imshow(y)
+
+    plt.show()
