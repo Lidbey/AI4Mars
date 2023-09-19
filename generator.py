@@ -13,7 +13,7 @@ class DataGenerator(Sequence):
     def __init__(self,
                  list_IDs,
                  image_path = 'data/ai4mars-dataset-merged-0.1/msl/images/edr/',
-                 mask_path = 'data/ai4mars-dataset-merged-0.1/msl/labels/train/',
+                 label_path = 'data/ai4mars-dataset-merged-0.1/msl/labels/train/',
                  batch_size=32,
                  dim=(128, 128), n_channels=1,
                  n_classes=5, shuffle=True):
@@ -22,7 +22,7 @@ class DataGenerator(Sequence):
         self.dim = dim
         self.batch_size = batch_size
         self.image_path = image_path
-        self.mask_path = mask_path
+        self.label_path = label_path
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.shuffle = shuffle
@@ -52,7 +52,7 @@ class DataGenerator(Sequence):
 
         for i, ID in enumerate(list_IDs_temp):
 
-            labelPath = self.mask_path + ID + '.PNG'
+            labelPath = self.label_path + ID + '.PNG'
             label = iio.imread(labelPath)
             y[i] = resize(label, self.dim, tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
