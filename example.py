@@ -6,7 +6,7 @@ import models
 SAVE_MODEL = True
 MODEL_NAME = 'URX_resnext50'
 PREDICT_IMG = 'NLA_397681429EDR_F0020000AUT_04096M1'
-model_map={"URX": models.Unet_resnext50(), "DFT": None}
+model_map={"URX": models.Unet_resnext50(), "LNT": models.Linknet_densenet201(), "DFT": None}
 
 model_type = "DFT"
 if len(MODEL_NAME)>2 and MODEL_NAME[:3] in model_map:
