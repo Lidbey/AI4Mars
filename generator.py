@@ -4,36 +4,29 @@ import tensorflow as tf
 from keras.utils import Sequence
 from keras.utils import to_categorical
 import os
-import imageio.v3 as iio
+import imageio as iio
 
 from preprocessing import resize
 
 
 class DataGenerator(Sequence):
     def __init__(self,
+                 list_IDs,
                  image_path = 'data/ai4mars-dataset-merged-0.1/msl/images/edr/',
-                 mask_path = 'data/ai4mars-dataset-merged-0.1/msl/labels/train/',
+                 label_path = 'data/ai4mars-dataset-merged-0.1/msl/labels/train/',
                  batch_size=32,
                  dim=(128, 128), n_channels=1,
-                 n_classes=5, shuffle=True, n=-1):
+                 n_classes=5, shuffle=True):
 
-        self.list_IDs = []
+        self.list_IDs = list_IDs
         self.dim = dim
         self.batch_size = batch_size
         self.image_path = image_path
-        self.mask_path = mask_path
+        self.label_path = label_path
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.shuffle = shuffle
-        self.n = n
 
-        for labelPath in glob.iglob(f'{mask_path}/*'):
-            labelName = os.path.basename(labelPath)
-            photoName = os.path.splitext(labelName)[0]
-            self.list_IDs.append(photoName)
-
-        if n != -1:
-            self.list_IDs = self.list_IDs[0:n]
         self.on_epoch_end()
 
 
@@ -59,7 +52,7 @@ class DataGenerator(Sequence):
 
         for i, ID in enumerate(list_IDs_temp):
 
-            labelPath = self.mask_path + ID + '.PNG'
+            labelPath = self.label_path + ID + '.PNG'
             label = iio.imread(labelPath)
             y[i] = resize(label, self.dim, tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 

@@ -1,4 +1,7 @@
 from tensorflow.keras import layers
+import segmentation_models as sm
+from keras.layers import Input, Conv2D
+from keras.models import Model
 import keras
 
 MODEL_PATH = 'models/'
@@ -55,11 +58,58 @@ def modelv1(img_size, num_classes):
     model = keras.Model(inputs, outputs)
     return model
 
+def Unet_resnext50():
+    BACKBONE = 'resnext50'
+    preprocess_input = sm.get_preprocessing(BACKBONE)
+
+    base_model = sm.Unet(BACKBONE, classes=5, activation='softmax', encoder_weights='imagenet')
+
+
+    inp = Input(shape=(128, 128, 1))
+    l1 = Conv2D(3, (3, 3), padding='same')(inp) # map N channels data to 3 channels
+    out = base_model(l1)
+
+    model = Model(inputs=inp, outputs=out, name=base_model.name)
+
+    model.compile(
+        'Adam',
+        loss=sm.losses.bce_jaccard_loss,
+        metrics=[sm.metrics.iou_score],
+    )
+    return model
+
+def Linknet_densenet201():
+    BACKBONE = 'densenet201'
+    preprocess_input = sm.get_preprocessing(BACKBONE)
+
+    base_model = sm.Linknet(BACKBONE, classes=5, activation='softmax', encoder_weights='imagenet')
+
+    inp = Input(shape=(None, None, 1))
+    l1 = Conv2D(3, (1, 1))(inp) # map N channels data to 3 channels
+    out = base_model(l1)
+
+    model = Model(inp, out, name=base_model.name)
+
+    model.compile(
+        'Adam',
+        loss=sm.losses.bce_jaccard_loss,
+        metrics=[sm.metrics.iou_score],
+    )
+    return model
+
 #def modelv2():
 
-def saveModel(model, name):
-    model.save(f'models/{name}')
+def saveModel(model, name, weights_only=False):
+    if weights_only:
+        model.save_weights(f'models/{name}')
+    else:
+        model.save(f'models/{name}')
 
-def loadModel(name):
-    model = keras.models.load_model(f'models/{name}')
+def loadModel(name, model=None):
+    if model is None:
+        model = keras.models.load_model(f'models/{name}')
+    else:
+        model.load_weights(f'models/{name}')
     return model
+
+
