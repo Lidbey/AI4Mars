@@ -40,10 +40,8 @@ def predict(model, fileName, shape=(128,128)):
     image_path = 'data/ai4mars-dataset-merged-0.1/msl/images/edr/'
     label_path = 'data/ai4mars-dataset-merged-0.1/msl/labels/train/'
     yPath = label_path + fileName + '.PNG'
-
     label = iio.imread(yPath)
     y = resize(label, shape, tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-
     photoPath = image_path + fileName + '.JPG'
     photo = iio.imread(photoPath)
     x = resize(photo, shape)
@@ -58,7 +56,20 @@ def predict(model, fileName, shape=(128,128)):
 
 def plot(imgs):
     f, axarr = plt.subplots(1, len(imgs))
-    for i, img in enumerate(imgs):
-        axarr[i].imshow(ImageOps.autocontrast(keras.utils.array_to_img(img)))
-    plt.show()
 
+    # image
+    axarr[0].imshow(imgs[0])
+
+    # true labels
+    y = imgs[1].numpy()
+    y[y == 255] = 4
+    y = y * 63.75
+    axarr[1].imshow(y)
+
+    # predicted labels
+    y = imgs[2]
+    y[y == 255] = 4
+    y = y * 63.75
+    axarr[2].imshow(y)
+
+    plt.show()
