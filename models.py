@@ -78,6 +78,25 @@ def Unet_resnext50():
     )
     return model
 
+def Linknet_densenet201():
+    BACKBONE = 'densenet201'
+    preprocess_input = sm.get_preprocessing(BACKBONE)
+
+    base_model = sm.Linknet(BACKBONE, classes=5, activation='softmax', encoder_weights='imagenet')
+
+    inp = Input(shape=(None, None, 1))
+    l1 = Conv2D(3, (1, 1))(inp) # map N channels data to 3 channels
+    out = base_model(l1)
+
+    model = Model(inp, out, name=base_model.name)
+
+    model.compile(
+        'Adam',
+        loss=sm.losses.bce_jaccard_loss,
+        metrics=[sm.metrics.iou_score],
+    )
+    return model
+
 #def modelv2():
 
 def saveModel(model, name, weights_only=False):
