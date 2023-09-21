@@ -97,6 +97,9 @@ def Linknet_densenet201():
     )
     return model
 
+def default():
+    return None
+
 #def modelv2():
 
 def saveModel(model, name, weights_only=False):
