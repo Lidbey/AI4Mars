@@ -61,7 +61,7 @@ def plot(imgs):
     axarr[0].imshow(imgs[0])
 
     # true labels
-    y = imgs[1].numpy()
+    y = np.array(imgs[1])
     y[y == 255] = 4
     y = y * 63.75
     axarr[1].imshow(y)
