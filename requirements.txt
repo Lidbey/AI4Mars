@@ -3,4 +3,6 @@ keras
 matplotlib
 numpy
 imageio
+segmentation_models
 tensorflow==2.9.3
+
