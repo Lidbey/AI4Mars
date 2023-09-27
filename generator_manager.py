@@ -11,6 +11,7 @@ class DataManager():
     def __init__(self, val_split=0.8, batch_size=32, n=-1, data_path='data/ai4mars-dataset-merged-0.1/msl/labels/train/'):
 
         self.name = str(n) + '_' + str(val_split)
+        self.batch_size=batch_size
 
         if os.path.exists(f'sets/{self.name}.pickle'):
             self.load()
@@ -35,14 +36,14 @@ class DataManager():
         if not os.path.exists('sets'):
             os.makedirs('sets')
         with open (f'sets/{self.name}.pickle', 'wb+') as handle:
-            pickle.dump((self.training_generator, self.val_generator), handle)
+            pickle.dump((self.training_generator.list_IDs, self.val_generator.list_IDs), handle)
 
 
     def load(self):
         with open (f'sets/{self.name}.pickle', 'rb') as handle:
             generators = pickle.load(handle)
-            self.training_generator = generators[0]
-            self.val_generator = generators[1]
+            self.training_generator = DataGenerator(list_IDs=generators[0], batch_size=self.batch_size)
+            self.val_generator = DataGenerator(list_IDs=generators[1], batch_size=self.batch_size)
 
     def get(self):
         return (self.training_generator, self.val_generator)
