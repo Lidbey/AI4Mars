@@ -168,7 +168,6 @@ def modelDN201():
                                        strides=2,
                                        padding='same',
                                        )(out)
-    print(out)
     # complete unet model
     unet = keras.Model(inputs=input, outputs=out)
     return unet
