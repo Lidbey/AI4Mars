@@ -15,7 +15,7 @@ def calc_stats(true, pred):
 
     cm = confusion_matrix(true,
                           pred,
-                          labels=[0, 1, 2, 3, 255])
+                          labels=[0., 1., 2., 3., 4.])
 
     prec = {'soil': cm[0, 0] / np.sum(cm[:, 0]),
             'bedrock': cm[1, 1] / np.sum(cm[:, 1]),
@@ -37,7 +37,7 @@ def calc_stats(true, pred):
                }
 
     disp = ConfusionMatrixDisplay(confusion_matrix=cm,
-                                  display_labels=[0, 1, 2, 3, 255])
+                                  display_labels=[0., 1., 2., 3., 4.])
     disp.plot(cmap='Blues')
     plt.show()
 
