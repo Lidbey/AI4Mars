@@ -36,10 +36,15 @@ def callbackModelEpoch(directory, weights_only=False):
     return checkpoint_callback
 
 
-def predict(model, fileName, shape=(128,128)):
-    image_path = 'data/ai4mars-dataset-merged-0.1/msl/images/edr/'
-    label_path = 'data/ai4mars-dataset-merged-0.1/msl/labels/train/'
-    yPath = label_path + fileName + '.PNG'
+def predict(model, fileName, shape=(128,128),
+            image_path='data/ai4mars-dataset-merged-0.1/msl/images/edr/',
+            label_path='data/ai4mars-dataset-merged-0.1/msl/labels/train/',
+            test=False):
+
+    if test:
+        yPath = label_path + fileName + '_merged.png'
+    else:
+        yPath = label_path + fileName + '.PNG'
     label = iio.imread(yPath)
     y = resize(label, shape, tf.image.ResizeMethod.NEAREST_NEIGHBOR)
     photoPath = image_path + fileName + '.JPG'
@@ -49,8 +54,10 @@ def predict(model, fileName, shape=(128,128)):
     x = x / 255.0
     y = y.__array__()
     y[y == 255] = 4
-    yPred = np.argmax(model.predict(np.array([x])), axis=-1)
-
+    if test:
+        yPred = np.argmax(model.predict(np.array([x]), verbose=0), axis=-1)
+    else:
+        yPred = np.argmax(model.predict(np.array([x])), axis=-1)
     return [x, y, yPred[0][..., np.newaxis]]
 
 
