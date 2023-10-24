@@ -1,6 +1,9 @@
 from tensorflow.keras import layers
+import segmentation_models as sm
+from keras.layers import Input, Conv2D
+from keras.models import Model
 import keras
-
+from tensorflow_examples.models.pix2pix import pix2pix
 MODEL_PATH = 'models/'
 
 def modelv1(img_size, num_classes):
@@ -55,11 +58,116 @@ def modelv1(img_size, num_classes):
     model = keras.Model(inputs, outputs)
     return model
 
+def Unet_resnext50():
+    BACKBONE = 'resnext50'
+    preprocess_input = sm.get_preprocessing(BACKBONE)
+
+    base_model = sm.Unet(BACKBONE, classes=5, activation='softmax', encoder_weights='imagenet')
+
+
+    inp = Input(shape=(128, 128, 1))
+    l1 = Conv2D(3, (3, 3), padding='same')(inp) # map N channels data to 3 channels
+    out = base_model(l1)
+
+    model = Model(inputs=inp, outputs=out, name=base_model.name)
+
+    model.compile(
+        'Adam',
+        loss=sm.losses.bce_jaccard_loss,
+        metrics=[sm.metrics.iou_score],
+    )
+    return model
+
+def Linknet_densenet201():
+    BACKBONE = 'densenet201'
+    preprocess_input = sm.get_preprocessing(BACKBONE)
+
+    base_model = sm.Linknet(BACKBONE, classes=5, activation='softmax', encoder_weights='imagenet')
+
+    inp = Input(shape=(None, None, 1))
+    l1 = Conv2D(3, (1, 1))(inp) # map N channels data to 3 channels
+    out = base_model(l1)
+
+    model = Model(inp, out, name=base_model.name)
+
+    model.compile(
+        'Adam',
+        loss=sm.losses.bce_jaccard_loss,
+        metrics=[sm.metrics.iou_score],
+    )
+    return model
+
+def default():
+    return None
+
 #def modelv2():
 
-def saveModel(model, name):
-    model.save(f'models/{name}')
+def saveModel(model, name, weights_only=False):
+    if weights_only:
+        model.save_weights(f'models/{name}')
+    else:
+        model.save(f'models/{name}')
 
-def loadModel(name):
-    model = keras.models.load_model(f'models/{name}')
+def loadModel(name, model=None):
+    if model is None:
+        model = keras.models.load_model(f'models/{name}')
+    else:
+        model.load_weights(f'models/{name}')
     return model
+
+def modelDN201():
+    base = keras.applications.DenseNet201(input_shape=[128, 128, 3],
+                                          include_top=False,
+                                          weights='imagenet')
+    # ----------------------------------------------------------12
+    # final ReLU activation layer for each feature map size, i.e. 4, 8, 16, 32, and 64, required for skip-connections
+    skip_names = ['conv1/relu',  # size 64*64
+                  'pool2_relu',  # size 32*32
+                  'pool3_relu',  # size 16*16
+                  'pool4_relu',  # size 8*8
+                  'relu'  # size 4*4
+                  ]
+    # ----------------------------------------------------------13
+    # output of these layers
+    skip_outputs = [base.get_layer(name).output for name in skip_names]
+    # Building the downstack with the above layers. We use the pre-trained model as such, without any fine-tuning.
+    downstack = keras.Model(inputs=base.input,
+                            outputs=skip_outputs)
+    # freeze the downstack layers
+    downstack.trainable = False
+    # ----------------------------------------------------------14
+
+    # Four upstack layers for upsampling sizes
+    # 4->8, 8->16, 16->32, 32->64
+    upstack = [pix2pix.upsample(512, 3),
+               pix2pix.upsample(256, 3),
+               pix2pix.upsample(128, 3),
+               pix2pix.upsample(64, 3)]
+    # ----------------------------------------------------------15
+    # define the input layer
+    input = keras.layers.Input(shape=[128, 128, 1])
+    inputs = Conv2D(3, (1, 1), padding='same')(input)  # map N channels data to 3 channels
+
+
+    # downsample
+    down = downstack(inputs)
+    out = down[-1]
+
+    # prepare skip-connections
+    skips = reversed(down[:-1])
+    # choose the last layer at first 4 --> 8
+
+    # upsample with skip-connections
+    for up, skip in zip(upstack, skips):
+        out = up(out)
+        out = keras.layers.Concatenate()([out, skip])
+
+    # define the final transpose conv layer
+    # image 128 by 128 with 59 classes
+    out = keras.layers.Conv2DTranspose(5, 3,
+                                       strides=2,
+                                       padding='same',
+                                       )(out)
+    # complete unet model
+    unet = keras.Model(inputs=input, outputs=out)
+    return unet
