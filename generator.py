@@ -12,11 +12,12 @@ from preprocessing import resize
 class DataGenerator(Sequence):
     def __init__(self,
                  list_IDs,
-                 image_path = 'data/ai4mars-dataset-merged-0.1/msl/images/edr/',
-                 label_path = 'data/ai4mars-dataset-merged-0.1/msl/labels/train/',
+                 path = 'data\\ai4mars-dataset-merged-0.1',
                  batch_size=32,
                  dim=(128, 128), n_channels=1,
                  n_classes=5, shuffle=True):
+        image_path = os.path.join(path,'msl\\images\\edr\\')
+        label_path = os.path.join(path,'msl\\labels\\train\\')
 
         self.list_IDs = list_IDs
         self.dim = dim
