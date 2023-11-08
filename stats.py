@@ -23,11 +23,13 @@ import time
 import pandas as pd
 
 
-def calc_stats(model, name, date, training_time, learning_rate, batch_size, shape=(128, 128)):
+def calc_stats(model, name, date, training_time=None, learning_rate=None, batch_size=None, shape=(128, 128)):
+    # count params
     trainableParams = np.sum([np.prod(v.get_shape()) for v in model.trainable_weights])
     nonTrainableParams = np.sum([np.prod(v.get_shape()) for v in model.non_trainable_weights])
     totalParams = trainableParams + nonTrainableParams
 
+    # calculate model loss on test dataset
     image_path = 'data/ai4mars-dataset-merged-0.1/msl/images/edr/'
     label_path = 'data/ai4mars-dataset-merged-0.1/msl/labels/test/masked-gold-min1-100agree/'
 
@@ -35,7 +37,7 @@ def calc_stats(model, name, date, training_time, learning_rate, batch_size, shap
     images = []
     for filename in os.listdir(label_path):
         yPath = label_path + filename
-        xPath = image_path + filename[:-11] + '.JPG'
+        xPath = image_path + filename + '.JPG'
         labels.append(iio.imread(yPath))
         images.append(iio.imread(xPath))
 
@@ -52,11 +54,15 @@ def calc_stats(model, name, date, training_time, learning_rate, batch_size, shap
     x = x / 255.0
 
     eval = model.evaluate(x, to_categorical(y))
+    test_loss = eval[0]
+    test_iou = eval[1]
 
+    # calculate average prediction time
     start = time.time()
     predictions = model.predict(x)
     avg_pred_time = (time.time() - start) / len(images)
 
+    # calculate confusion matrix on test dataset
     predictions = np.argmax(predictions, axis=-1)
     true = y.flatten()
     pred = predictions.flatten()
@@ -99,7 +105,7 @@ def calc_stats(model, name, date, training_time, learning_rate, batch_size, shap
     stats = {"Parameters": totalParams, "Trainable Parameters": trainableParams,
              "Non Trainable Parameters": nonTrainableParams, "Prediction Time": avg_pred_time,
              "Training Time": training_time, "Learning Rate": learning_rate,
-             "Batch Size": batch_size, "Test Loss": eval[0], "Test IoU": eval[1]}
+             "Batch Size": batch_size, "Test Loss": test_loss, "Test IoU": test_iou}
     df = pd.DataFrame(stats, index=[name])
     df.to_csv(f"./stats/{name}-{date}/stats")
     print(f"Stats saved at ./stats/{name}-{date}/")
