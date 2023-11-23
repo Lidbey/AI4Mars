@@ -5,9 +5,9 @@ import os
 
 
 SAVE_MODEL = True
-MODEL_NAME = 'DNM_densenet201'
+MODEL_NAME = 'v1'
 PREDICT_IMG = 'NLA_397681429EDR_F0020000AUT_04096M1'
-PATH = 'D:\\Projekt Badawczy\\ai4mars-dataset-merged-0.1'
+PATH = 'data/ai4mars-dataset-merged-0.1'
 
 model_map={"URX": models.Unet_resnext50, "LNT": models.Linknet_densenet201, "DFT": models.default, "DNM":models.modelDN201}
 
