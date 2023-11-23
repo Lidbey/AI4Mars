@@ -2,7 +2,7 @@ import sys
 import keras
 import numpy as np
 from PIL import ImageOps
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, CSVLogger
 from matplotlib import pyplot as plt
 import os
 from tensorflow import metrics
@@ -17,7 +17,8 @@ def basicTrain(model, epochs, batch_size=64, n=-1, learning_rate=0.001,  save_fr
     keras.backend.set_value(model.optimizer.learning_rate, learning_rate)
     generator = DataManager(val_split=val_split, batch_size=batch_size, n=n, data_path=path)
     training_generator, val_generator = generator.get()
-    return model.fit(training_generator, epochs=epochs, callbacks=[callbackModelEpoch('models/checkpoints', weights_only)], validation_data = val_generator)
+    csv_logger = CSVLogger("model_history_log.csv", append=True)
+    model.fit(training_generator, epochs=epochs, callbacks=[csv_logger,callbackModelEpoch('models/checkpoints', weights_only)], validation_data = val_generator)
 
 
 def callbackModelBatch(directory, n=100, weights_only=False):
