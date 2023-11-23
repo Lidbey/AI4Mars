@@ -79,7 +79,7 @@ def calc_stats(model, name, date, training_time=None, learning_rate=None, batch_
         plt.savefig(f"./stats/{name}-{date}/confusion-matrix.png")
     else:
         os.mkdir(f"./stats/{name}-{date}/")
-        plt.savefig(f"./stats/{name}-{date}/confusion-matrix-normalized.png")
+        plt.savefig(f"./stats/{name}-{date}/confusion-matrix.png")
     plt.close()
     cm_norm = confusion_matrix(true,
                                pred,
@@ -88,10 +88,10 @@ def calc_stats(model, name, date, training_time=None, learning_rate=None, batch_
     disp = ConfusionMatrixDisplay(confusion_matrix=cm_norm, display_labels=['soil', 'bedrock', 'sand', 'big rock', 'null'])
     disp.plot()
     if os.path.exists(f"./stats/{name}-{date}/"):
-        plt.savefig(f"./stats/{name}-{date}/confusion-matrix.png")
+        plt.savefig(f"./stats/{name}-{date}/confusion-matrix-normalized.png")
     else:
         os.mkdir(f"./stats/{name}-{date}/")
-        plt.savefig(f"./stats/{name}-{date}/confusion-matrix.png")
+        plt.savefig(f"./stats/{name}-{date}/confusion-matrix-normalized.png")
     plt.close()
 
     # prec = {'soil': cm[0, 0] / np.sum(cm[:, 0]),
