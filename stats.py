@@ -53,9 +53,12 @@ def calc_stats(model, name, date, training_time=None, learning_rate=None, batch_
     y[y == 255] = 4
     x = x / 255.0
 
+    model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=[metrics.mae, metrics.categorical_accuracy])
     eval = model.evaluate(x, to_categorical(y))
     test_loss = eval[0]
-    test_iou = eval[1]
+    test_mae = eval[1]
+    test_acc = eval[2]
+    # test_iou = eval[3]
 
     # calculate average prediction time
     start = time.time()
@@ -70,10 +73,26 @@ def calc_stats(model, name, date, training_time=None, learning_rate=None, batch_
     cm = confusion_matrix(true,
                           pred,
                           labels=[0., 1., 2., 3., 4.])
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['soil', 'bedrock', 'sand', 'big rock', 'null'])
+    disp.plot()
+    if os.path.exists(f"./stats/{name}-{date}/"):
+        plt.savefig(f"./stats/{name}-{date}/confusion-matrix.png")
+    else:
+        os.mkdir(f"./stats/{name}-{date}/")
+        plt.savefig(f"./stats/{name}-{date}/confusion-matrix-normalized.png")
+    plt.close()
     cm_norm = confusion_matrix(true,
                                pred,
                                normalize='true',
                                labels=[0., 1., 2., 3., 4.])
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm_norm, display_labels=['soil', 'bedrock', 'sand', 'big rock', 'null'])
+    disp.plot()
+    if os.path.exists(f"./stats/{name}-{date}/"):
+        plt.savefig(f"./stats/{name}-{date}/confusion-matrix.png")
+    else:
+        os.mkdir(f"./stats/{name}-{date}/")
+        plt.savefig(f"./stats/{name}-{date}/confusion-matrix.png")
+    plt.close()
 
     # prec = {'soil': cm[0, 0] / np.sum(cm[:, 0]),
     #         'bedrock': cm[1, 1] / np.sum(cm[:, 1]),
@@ -105,7 +124,11 @@ def calc_stats(model, name, date, training_time=None, learning_rate=None, batch_
     stats = {"Parameters": totalParams, "Trainable Parameters": trainableParams,
              "Non Trainable Parameters": nonTrainableParams, "Prediction Time": avg_pred_time,
              "Training Time": training_time, "Learning Rate": learning_rate,
-             "Batch Size": batch_size, "Test Loss": test_loss, "Test IoU": test_iou}
+             "Batch Size": batch_size, "Test Loss": test_loss, "Test MAE": test_mae,
+             "Test Acc": test_acc}
+
+    # Dodać accuracy dobrze / wszystkie
+
     df = pd.DataFrame(stats, index=[name])
     df.to_csv(f"./stats/{name}-{date}/stats.csv")
     print(f"Stats saved at ./stats/{name}-{date}/")
