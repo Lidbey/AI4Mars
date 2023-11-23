@@ -17,7 +17,7 @@ print(model_type)
 model = model_map[model_type]()
 weights_only = True if model else False
 model = models.loadModel(MODEL_NAME, model)
-training.basicTrain(model, epochs=200, n=-1, batch_size=8, learning_rate=0.001, weights_only=weights_only, val_split=0.8)
+training.basicTrain(model, name = MODEL_NAME, epochs=200, n=-1, batch_size=8, learning_rate=0.001, weights_only=weights_only, val_split=0.8)
 models.saveModel(model, model_type+"_"+
                         datetime.now().strftime('%d-%m-%y %H-%M-%S') if SAVE_MODEL else 'temp', weights_only=weights_only)
 imgs = training.predict(model, PREDICT_IMG, path=PATH)
