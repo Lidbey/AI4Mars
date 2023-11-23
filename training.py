@@ -17,7 +17,7 @@ def basicTrain(model, epochs, batch_size=64, n=-1, learning_rate=0.001,  save_fr
     keras.backend.set_value(model.optimizer.learning_rate, learning_rate)
     generator = DataManager(val_split=val_split, batch_size=batch_size, n=n, data_path=path)
     training_generator, val_generator = generator.get()
-    model.fit(training_generator, epochs=epochs, callbacks=[callbackModelEpoch('models/checkpoints', weights_only)], validation_data = val_generator)
+    return model.fit(training_generator, epochs=epochs, callbacks=[callbackModelEpoch('models/checkpoints', weights_only)], validation_data = val_generator)
 
 
 def callbackModelBatch(directory, n=100, weights_only=False):
@@ -74,3 +74,4 @@ def plot(imgs):
     axarr[2].imshow(y)
 
     plt.show()
+
