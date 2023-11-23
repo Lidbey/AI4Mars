@@ -2,7 +2,7 @@ import sys
 import keras
 import numpy as np
 from PIL import ImageOps
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, CSVLogger
 from matplotlib import pyplot as plt
 import os
 from tensorflow import metrics
@@ -82,3 +82,4 @@ def plot(imgs):
     axarr[2].imshow(y)
 
     plt.show()
+
