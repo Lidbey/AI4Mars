@@ -37,7 +37,7 @@ def calc_stats(model, name, date, training_time=None, learning_rate=None, batch_
     images = []
     for filename in os.listdir(label_path):
         yPath = label_path + filename
-        xPath = image_path + filename + '.JPG'
+        xPath = image_path + filename[:-11] + '.JPG'
         labels.append(iio.imread(yPath))
         images.append(iio.imread(xPath))
 
@@ -107,5 +107,5 @@ def calc_stats(model, name, date, training_time=None, learning_rate=None, batch_
              "Training Time": training_time, "Learning Rate": learning_rate,
              "Batch Size": batch_size, "Test Loss": test_loss, "Test IoU": test_iou}
     df = pd.DataFrame(stats, index=[name])
-    df.to_csv(f"./stats/{name}-{date}/stats")
+    df.to_csv(f"./stats/{name}-{date}/stats.csv")
     print(f"Stats saved at ./stats/{name}-{date}/")
