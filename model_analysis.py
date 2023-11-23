@@ -3,7 +3,7 @@ import models
 from stats import calc_stats
 
 
-MODEL_NAME = 'URX_resnext50'
+MODEL_NAME = 'model_16'
 model_map={"URX": models.Unet_resnext50, "LNT": models.Linknet_densenet201, "DFT": models.default}
 
 model_type = "DFT"
