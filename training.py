@@ -10,14 +10,15 @@ from generator_manager import DataManager
 import imageio as iio
 from preprocessing import resize
 import tensorflow as tf
+from keras.callbacks import CSVLogger
 
 def basicTrain(model, epochs, batch_size=64, n=-1, learning_rate=0.001,  save_freq=sys.maxsize, weights_only=False, val_split=0.8, path='data\\ai4mars-dataset-merged-0.1'):
-    path1 = os.path.join(path, 'msl\\labels\\train\\')
-    model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=[metrics.mae, metrics.categorical_accuracy])
+    model.compile(optimizer="sgd", loss=tf.keras.losses.KLDivergence(), metrics=[metrics.mae, metrics.categorical_accuracy])
     keras.backend.set_value(model.optimizer.learning_rate, learning_rate)
     generator = DataManager(val_split=val_split, batch_size=batch_size, n=n, data_path=path)
     training_generator, val_generator = generator.get()
-    model.fit(training_generator, epochs=epochs, callbacks=[callbackModelEpoch('models/checkpoints', weights_only)], validation_data = val_generator)
+    csv_logger = CSVLogger("model_history_log.csv", append=True)
+    model.fit(training_generator, epochs=epochs, callbacks=[csv_logger, callbackModelEpoch('models/checkpoints', weights_only)], validation_data = val_generator)
 
 
 def callbackModelBatch(directory, n=100, weights_only=False):
