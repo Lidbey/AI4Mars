@@ -6,3 +6,5 @@ imageio
 segmentation_models
 tensorflow==2.9.3
 tensorflow_examples @ git+https://github.com/tensorflow/examples.git
+pandas
+scikit-learn
