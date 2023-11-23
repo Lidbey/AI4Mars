@@ -31,7 +31,8 @@ class DataGenerator(Sequence):
                  n_classes=5, shuffle=True):
         image_path = os.path.join(path,'msl\\images\\edr\\')
         label_path = os.path.join(path,'msl\\labels\\train\\')
-
+        if len(list_IDs) == 0:
+            raise Exception("0 items in set, check sets file")
         self.list_IDs = list_IDs
         self.dim = dim
         self.batch_size = batch_size
