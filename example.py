@@ -9,11 +9,14 @@ import os
 import csv
 
 SAVE_MODEL = True
-MODEL_NAME = 'DNM_densenet201'
+MODEL_NAME = 'v1'
 PREDICT_IMG = 'NLA_397681429EDR_F0020000AUT_04096M1'
 PATH = 'data/ai4mars-dataset-merged-0.1'
 
 model_map={"URX": models.Unet_resnext50, "LNT": models.Linknet_densenet201, "DFT": models.default, "DNM":models.modelDN201}
+
+learning_rate = 0.001
+batch_size = 8
 
 model_type = "DFT"
 if len(MODEL_NAME)>2 and MODEL_NAME[:3] in model_map:
