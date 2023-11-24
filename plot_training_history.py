@@ -20,6 +20,7 @@ ax.grid(True, which="both")
 
 plt.xlabel('Epoch')
 plt.ylabel('Value')
+plt.title(MODEL_NAME)
 
 if not os.path.exists('history'):
     os.makedirs('history')
