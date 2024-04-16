@@ -68,6 +68,7 @@ def plot(imgs):
 
     # image
     axarr[0].imshow(imgs[0])
+    axarr[0].set_text('')
 
     # true labels
     y = np.array(imgs[1])

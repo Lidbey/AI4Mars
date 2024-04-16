@@ -2,10 +2,7 @@ from PIL import Image
 import os
 import pandas as pd
 
-import numpy as np
-# import required module
-from pathlib import Path
-path = 'masked-gold-min3-100agree'
+path = 'C:/Users/wicki/Desktop/prv/AI4Mars/data/ai4mars-dataset-merged-0.1/msl/labels/train'
 klSoil = []
 klBedrock = []
 klSand = []
@@ -17,7 +14,7 @@ Nazwy = []
 
 for filename in os.listdir(path):
     if filename.endswith(".png"):
-        im = Image.open("masked-gold-min3-100agree/{}".format(filename)).convert('RGB')
+        im = Image.open("data/ai4mars-dataset-merged-0.1/msl/labels/train/{}".format(filename)).convert('RGB')
         soil = 0
         bedrock = 0
         sand = 0
