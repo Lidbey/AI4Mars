@@ -1,9 +1,11 @@
 from datetime import datetime
-import models
-from stats import calc_stats
+from project import models
+from project.stats import calc_stats
+import os
+os.chdir("..")
 
 
-MODEL_NAME = 'model_16'
+MODEL_NAME = 'URX_Adagrad_1_small'
 model_map={"URX": models.Unet_resnext50, "LNT": models.Linknet_densenet201, "DFT": models.default}
 
 model_type = "DFT"

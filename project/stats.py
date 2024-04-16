@@ -1,35 +1,22 @@
-import os
-import time
-
 import numpy as np
-import sys
-import keras
-import numpy as np
-from PIL import ImageOps
-from keras.callbacks import ModelCheckpoint
-from matplotlib import pyplot as plt
 import os
 from tensorflow import metrics
-from generator_manager import DataManager
 import imageio as iio
-from preprocessing import resize
+from project.preprocessing import resize
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from keras.utils.np_utils import to_categorical
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-from training import predict
-from pprint import pprint
 import time
 import pandas as pd
 
 
 def calc_stats(model, name, date, training_time=None, learning_rate=None, batch_size=None, shape=(128, 128)):
-    # count params
+
     trainableParams = np.sum([np.prod(v.get_shape()) for v in model.trainable_weights])
     nonTrainableParams = np.sum([np.prod(v.get_shape()) for v in model.non_trainable_weights])
     totalParams = trainableParams + nonTrainableParams
 
-    # calculate model loss on test dataset
     image_path = 'data/ai4mars-dataset-merged-0.1/msl/images/edr/'
     label_path = 'data/ai4mars-dataset-merged-0.1/msl/labels/test/masked-gold-min1-100agree/'
 
@@ -58,14 +45,11 @@ def calc_stats(model, name, date, training_time=None, learning_rate=None, batch_
     test_loss = eval[0]
     test_mae = eval[1]
     test_acc = eval[2]
-    # test_iou = eval[3]
 
-    # calculate average prediction time
     start = time.time()
     predictions = model.predict(x)
     avg_pred_time = (time.time() - start) / len(images)
 
-    # calculate confusion matrix on test dataset
     predictions = np.argmax(predictions, axis=-1)
     true = y.flatten()
     pred = predictions.flatten()
@@ -93,25 +77,6 @@ def calc_stats(model, name, date, training_time=None, learning_rate=None, batch_
         os.mkdir(f"./stats/{name}-{date}/")
         plt.savefig(f"./stats/{name}-{date}/confusion-matrix-normalized.png")
     plt.close()
-
-    # prec = {'soil': cm[0, 0] / np.sum(cm[:, 0]),
-    #         'bedrock': cm[1, 1] / np.sum(cm[:, 1]),
-    #         'sand': cm[2, 2] / np.sum(cm[:, 2]),
-    #         'big rock': cm[3, 3] / np.sum(cm[:, 3]),
-    #         'null': cm[3, 3] / np.sum(cm[:, 3])
-    #         }
-    # rec = {'soil': cm[0, 0] / np.sum(cm[0, :]),
-    #        'bedrock': cm[1, 1] / np.sum(cm[1, :]),
-    #        'sand': cm[2, 2] / np.sum(cm[2, :]),
-    #        'big rock': cm[3, 3] / np.sum(cm[3, :]),
-    #        'null': cm[4, 4] / np.sum(cm[3, :])
-    #        }
-    # f_score = {'soil': 2 * prec['soil'] * rec['soil'] / (prec['soil'] + rec['soil']),
-    #            'bedrock': 2 * prec['bedrock'] * rec['bedrock'] / (prec['bedrock'] + rec['bedrock']),
-    #            'sand': 2 * prec['sand'] * rec['sand'] / (prec['sand'] + rec['sand']),
-    #            'big rock': 2 * prec['big rock'] * rec['big rock'] / (prec['big rock'] + rec['big rock']),
-    #            'null': 2 * prec['null'] * rec['null'] / (prec['null'] + rec['null'])
-    #            }
 
     if os.path.exists(f"./stats/{name}-{date}/"):
         np.save(f"./stats/{name}-{date}/confusion-matrix", cm)

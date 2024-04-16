@@ -1,4 +1,3 @@
-import glob
 import numpy as np
 import tensorflow as tf
 from keras.utils import Sequence
@@ -6,7 +5,7 @@ from keras.utils.np_utils import to_categorical
 import os
 import imageio as iio
 
-from preprocessing import resize
+from project.preprocessing import resize
 
 
 def map_searchsort(arr):

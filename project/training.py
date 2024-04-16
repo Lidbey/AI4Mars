@@ -6,9 +6,9 @@ from keras.callbacks import ModelCheckpoint, CSVLogger
 from matplotlib import pyplot as plt
 import os
 from tensorflow import metrics
-from generator_manager import DataManager
+from project.generator_manager import DataManager
 import imageio as iio
-from preprocessing import resize
+from project.preprocessing import resize
 import tensorflow as tf
 from keras.callbacks import CSVLogger
 
@@ -52,7 +52,6 @@ def predict(model, fileName, shape=(128,128),
     photoPath = image_path + fileName + '.JPG'
     photo = iio.imread(photoPath)
     x = resize(photo, shape)
-    #y = to_categorical(y)
     x = x / 255.0
     y = y.__array__()
     y[y == 255] = 4
@@ -66,17 +65,13 @@ def predict(model, fileName, shape=(128,128),
 def plot(imgs):
     f, axarr = plt.subplots(1, len(imgs))
 
-    # image
     axarr[0].imshow(imgs[0])
-    axarr[0].set_text('')
 
-    # true labels
     y = np.array(imgs[1])
     y[y == 255] = 4
     y = y * 63.75
     axarr[1].imshow(y)
 
-    # predicted labels
     y = imgs[2]
     y[y == 255] = 4
     y = y * 63.75

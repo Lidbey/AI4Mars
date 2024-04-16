@@ -2,9 +2,8 @@ import glob
 import os
 import random
 import numpy as np
-from generator import DataGenerator
+from project.generator import DataGenerator
 import pickle
-
 
 
 class DataManager():
@@ -13,7 +12,7 @@ class DataManager():
         data_path1 = os.path.join(data_path, 'msl\\labels\\train\\')
 
         self.name = str(n) + '_' + str(val_split)
-        self.batch_size=batch_size
+        self.batch_size = batch_size
         self.data_path = data_path
         if os.path.exists(f'sets/{self.name}.pickle'):
             self.load()
@@ -27,26 +26,24 @@ class DataManager():
                 photo_names.append(photoName)
                 if cnt >= n and n != -1:
                     break
-            training_names = random.sample(photo_names, round(val_split*len(photo_names)))
+            training_names = random.sample(photo_names, round(val_split * len(photo_names)))
             val_names = np.setdiff1d(photo_names, training_names)
-            self.training_generator = DataGenerator(list_IDs=training_names, batch_size=batch_size, path = data_path)
-            self.val_generator = DataGenerator(list_IDs=val_names, batch_size=batch_size, path = data_path)
+            self.training_generator = DataGenerator(list_IDs=training_names, batch_size=batch_size, path=data_path)
+            self.val_generator = DataGenerator(list_IDs=val_names, batch_size=batch_size, path=data_path)
             self.save()
 
     def save(self):
         if not os.path.exists('sets'):
             os.makedirs('sets')
-        with open (f'sets/{self.name}.pickle', 'wb+') as handle:
+        with open(f'sets/{self.name}.pickle', 'wb+') as handle:
             pickle.dump((self.training_generator.list_IDs, self.val_generator.list_IDs), handle)
 
-
     def load(self):
-        with open (f'sets/{self.name}.pickle', 'rb') as handle:
+        with open(f'sets/{self.name}.pickle', 'rb') as handle:
             generators = pickle.load(handle)
-            self.training_generator = DataGenerator(list_IDs=generators[0], batch_size=self.batch_size, path=self.data_path)
+            self.training_generator = DataGenerator(list_IDs=generators[0], batch_size=self.batch_size,
+                                                    path=self.data_path)
             self.val_generator = DataGenerator(list_IDs=generators[1], batch_size=self.batch_size, path=self.data_path)
 
     def get(self):
         return (self.training_generator, self.val_generator)
-
-
